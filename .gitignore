@@ -1,0 +1,28 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+# Unreal Engine (project lives in unreal/VR_Apartment_Test)
+unreal/**/Binaries/
+unreal/**/Build/
+unreal/**/DerivedDataCache/
+unreal/**/Intermediate/
+unreal/**/Saved/
+unreal/**/.vs/
+unreal/**/*.sln
+*.VC.db
+*.opensdf
+*.sdf
+*.suo
+
+# Backups made inside the editor are kept in Git history instead
+unreal/**/Content/**/Backup/
+
+# 3ds Max autosaves
+*.max.bak
+autoback/
