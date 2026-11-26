@@ -1,0 +1,14 @@
+{
+ "GREETING": {"ru": "Здравствуйте! Я ваш гид по этому проекту. Я покажу квартиру и расскажу о решениях дизайнера. Меню открывается кнопкой на контроллере.",
+              "en": "Hello! I am your guide to this project. I will walk you through the apartment and explain the designer's decisions. Open the menu with the button on your controller."},
+ "KITCHENHALL": {"ru": "Это кухня, объединённая с прихожей. По периметру потолка идёт скрытая светодиодная подсветка, она даёт мягкий свет вечером. Двери открываются с обеих сторон, попробуйте.",
+                 "en": "This is the kitchen, joined with the entrance hall. A hidden LED strip runs along the ceiling and gives soft light in the evening. The doors open from both sides, try them."},
+ "LIVING": {"ru": "Это гостиная, около 18,1 квадратного метра, высота потолка 2,7 метра. Раздвижные стеклянные двери объединяют её с кухней, а у окна есть рабочее место. В меню можно включить свет и поменять его оттенок.",
+            "en": "This is the living room, about 18.1 square meters, with a 2.7 meter ceiling. Sliding glass doors connect it with the kitchen, and there is a work place by the window. Use the menu to switch the light and change its color."},
+ "BEDROOM": {"ru": "Это спальня, около 14,3 квадратного метра. Шторы во всю высоту и тёплый свет делают её спокойной. Передвиньте солнце в меню, чтобы увидеть комнату вечером.",
+             "en": "This is the bedroom, about 14.3 square meters. Full-height curtains and warm light make it calm. Move the sun in the menu to see the room in the evening."},
+ "BATH": {"ru": "Это санузел с душевой, около 4 квадратных метров. Проверьте, как открывается дверь и хватает ли места для прохода.",
+          "en": "This is the bathroom with a shower, about 4 square meters. Check how the door opens and whether there is enough space to pass."},
+ "BALCONY": {"ru": "Это балкон, около 5,3 квадратного метра. Отсюда хорошо видно, как меняется дневной свет.",
+             "en": "This is the balcony, about 5.3 square meters. From here you can see how the daylight changes."}
+}
