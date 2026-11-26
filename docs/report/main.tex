@@ -1,0 +1,210 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Diploma Project Report — Pre-Defense 1 (Sections 1–3)
+% Based on the university thesis proposal template (MastersDoctoralThesis v1.6, LaTeXTemplates.com)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[
+11pt,
+russian, % second language for the Russian and Kyrgyz abstracts
+english, % main language (last option)
+singlespacing,
+liststotoc,
+headsepline,
+]{MastersDoctoralThesis}
+
+\usepackage[nottoc]{tocbibind}
+\usepackage{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A,T1]{fontenc} % T2A for Cyrillic (Russian and Kyrgyz), T1 for Latin
+
+\usepackage{mathpazo} % Palatino, as in the proposal
+
+\usepackage[round,authoryear]{natbib}
+\bibliographystyle{plainnat}
+
+\usepackage[autostyle=true]{csquotes}
+
+\usepackage{array,tabularx,booktabs}
+\usepackage{enumitem}
+\setlist{itemsep=2pt,topsep=4pt,parsep=0pt}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,columns=fullflexible,frame=single,framesep=6pt}
+\usepackage{textcomp}
+\usepackage{float} % keep tables under their headings
+\usepackage{xurl}
+
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\setlength{\emergencystretch}{3em}
+\newenvironment{tightblock}{\small\setlength{\tabcolsep}{4pt}}{}
+\newcommand{\sqm}{m\textsuperscript{2}}
+
+\geometry{
+	paper=a4paper,
+	inner=2.5cm,
+	outer=3.8cm,
+	bindingoffset=.5cm,
+	top=1.5cm,
+	bottom=1.5cm,
+}
+
+\thesistitle{JK3DStudio VR: Automated Generation of Interactive Virtual Reality
+Presentations from 3ds Max Interior Design Projects with a Fact-Grounded AI Guide}
+\supervisor{Dr. Andrei Ermakov}
+\examiner{}
+\degree{Bachelor}
+\author{Kiyalbek kyzy Jasmina}
+\addresses{}
+\keywords{virtual reality, interior design, Unreal Engine, AI guide, large language models, fact checking, Kyrgyzstan}
+\university{\href{http://alatoo.edu.kg/}{Ala-Too International University}}
+\department{\href{http://department.university.com}{Computer Science Department}}
+\faculty{\href{http://faculty.university.com}{Foundations of Creativity Industries}}
+
+\AtBeginDocument{
+\hypersetup{pdftitle=\ttitle}
+\hypersetup{pdfauthor=\authorname}
+\hypersetup{pdfkeywords=\keywordnames}
+}
+
+\begin{document}
+
+\frontmatter
+\pagestyle{plain}
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{.06\textheight}
+{\scshape\LARGE \univname\par}\vspace{1.5cm}
+
+\HRule \\[0.4cm]
+{\huge \bfseries \ttitle\par}\vspace{0.4cm}
+\HRule \\[1.5cm]
+
+\begin{minipage}[t]{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Author:}\\
+\authorname
+\end{flushleft}
+\end{minipage}
+\begin{minipage}[t]{0.4\textwidth}
+\begin{flushright} \large
+\emph{Supervisor:} \\
+\supname
+\end{flushright}
+\end{minipage}\\[3cm]
+
+\vfill
+
+\large \textit{A diploma project report for the degree of \degreename}\\[0.3cm]
+\textit{First pre-defense: Sections 1--3}\\[0.4cm]
+\deptname\\[2cm]
+
+\vfill
+
+{\large December 2026}\\[4cm]
+
+\vfill
+\end{center}
+\end{titlepage}
+
+%----------------------------------------------------------------------------------------
+%	DECLARATION PAGE
+%----------------------------------------------------------------------------------------
+
+\begin{declaration}
+\addchaptertocentry{\authorshipname}
+\noindent I, \authorname, declare that this report titled, \enquote{\ttitle} and the work presented in it are my own. I confirm that:
+
+\begin{itemize}
+\item This work was done wholly or mainly while in candidature for a degree at this university.
+\item Where I have consulted the published work of others, this is always clearly attributed.
+\item Where I have quoted from the work of others, the source is always given. With the exception of such quotations, this report is entirely my own work.
+\item I have acknowledged all main sources of help, including the AI tools listed in Appendix~\ref{AppendixA}.
+\item Where the work is based on work done by myself jointly with others, I have made clear exactly what was done by others and what I have contributed myself.\\
+\end{itemize}
+
+\noindent Signed:\\
+\rule[0.5em]{25em}{0.5pt}
+
+\noindent Date:\\
+\rule[0.5em]{25em}{0.5pt}
+\end{declaration}
+
+\cleardoublepage
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACTS (ENGLISH, RUSSIAN, KYRGYZ)
+%----------------------------------------------------------------------------------------
+
+\begin{abstract}
+\addchaptertocentry{\abstractname}
+\input{Abstracts/abstract_en}
+\end{abstract}
+
+\begin{extraAbstract}
+\addchaptertocentry{Abstract in Russian}
+\begin{otherlanguage}{russian}
+\input{Abstracts/abstract_ru}
+\end{otherlanguage}
+\end{extraAbstract}
+
+\begin{extraAbstract}
+\addchaptertocentry{Abstract in Kyrgyz}
+\begin{otherlanguage}{russian}
+\input{Abstracts/abstract_ky}
+\end{otherlanguage}
+\end{extraAbstract}
+
+%----------------------------------------------------------------------------------------
+%	LISTS
+%----------------------------------------------------------------------------------------
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+\begin{abbreviations}{ll}
+\textbf{AI} & \textbf{A}rtificial \textbf{I}ntelligence\\
+\textbf{API} & \textbf{A}pplication \textbf{P}rogramming \textbf{I}nterface\\
+\textbf{DSR} & \textbf{D}esign \textbf{S}cience \textbf{R}esearch\\
+\textbf{FPS} & \textbf{F}rames \textbf{P}er \textbf{S}econd\\
+\textbf{FR} & \textbf{F}unctional \textbf{R}equirement\\
+\textbf{HMD} & \textbf{H}ead-\textbf{M}ounted \textbf{D}isplay\\
+\textbf{LLM} & \textbf{L}arge \textbf{L}anguage \textbf{M}odel\\
+\textbf{MCP} & \textbf{M}odel \textbf{C}ontext \textbf{P}rotocol\\
+\textbf{MVP} & \textbf{M}inimum \textbf{V}iable \textbf{P}roduct\\
+\textbf{NFR} & \textbf{N}on-\textbf{F}unctional \textbf{R}equirement\\
+\textbf{RAG} & \textbf{R}etrieval-\textbf{A}ugmented \textbf{G}eneration\\
+\textbf{RQ} & \textbf{R}esearch \textbf{Q}uestion\\
+\textbf{SUS} & \textbf{S}ystem \textbf{U}sability \textbf{S}cale\\
+\textbf{TTS} & \textbf{T}ext-\textbf{T}o-\textbf{S}peech\\
+\textbf{UE} & \textbf{U}nreal \textbf{E}ngine\\
+\textbf{VR} & \textbf{V}irtual \textbf{R}eality\\
+\end{abbreviations}
+
+%----------------------------------------------------------------------------------------
+%	SECTIONS 1–3
+%----------------------------------------------------------------------------------------
+
+\mainmatter
+\pagestyle{thesis}
+
+\include{Chapters/Chapter1} % Section 1. Problems
+\include{Chapters/Chapter2} % Section 2. Aim and Objectives
+\include{Chapters/Chapter3} % Section 3. Methods and Material
+
+\appendix
+
+\include{Appendices/AppendixA} % Working process and use of AI tools
+\include{Appendices/AppendixB} % Plan to pre-defense 2
+
+\bibliography{references}
+
+\end{document}

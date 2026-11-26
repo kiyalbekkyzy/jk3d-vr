@@ -1,0 +1,294 @@
+\chapter{Methods and Material} % Section 3
+\label{Chapter3}
+
+The system is built as three parts: an Unreal Engine editor plugin, a VR application and an AI Gateway backend. At the first pre-defense the VR application is a working prototype, the plugin is partly automated by Python scripts, and the backend is implemented and covered by automated tests.
+
+%----------------------------------------------------------------------------------------
+\section{Methodology}
+
+The work follows Design Science Research: build an artefact that solves a stated problem, then evaluate it against measurable criteria. Development is iterative, in weekly cycles, and each cycle ends with an in-headset test on PICO 4 Ultra. Every issue is logged as problem, cause, fix and result; more than 50 such entries were recorded between 11 and 19 November 2026. Features were first built by hand on one pilot apartment and then automated. Table~\ref{tab:eval} links each research question to its method.
+
+\begin{table}[H]
+\centering
+\begin{tightblock}
+\begin{tabularx}{\textwidth}{P{1.0cm} L P{4.2cm}}
+\toprule
+\textbf{RQ} & \textbf{Method} & \textbf{Data} \\
+\midrule
+RQ1 & Timed preparation of 2 projects; count of detected versus actual movable elements & Stopwatch log, detection report \\
+RQ2 & Generate guide scripts with and without Fact Guard; count unsupported numbers & Automated test results \\
+RQ3 & Within-subject study: the same project shown as renders/360\textdegree{} and in VR; participants estimate room size, find planted door conflicts and rate light & Questionnaire, error in size estimates, SUS, comfort rating \\
+\bottomrule
+\end{tabularx}
+\end{tightblock}
+\caption{Evaluation methods by research question}
+\label{tab:eval}
+\end{table}
+
+%----------------------------------------------------------------------------------------
+\section{System Architecture}
+
+The source of truth is the 3ds Max scene with a naming standard. Datasmith carries geometry, materials and lights into Unreal Engine. The editor plugin prepares the level and writes the project passport. The VR application runs the show, and the AI Gateway turns the approved passport and the designer's key points into checked speech and audio (Figure~\ref{fig:arch}).
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=6mm and 5mm,
+  box/.style={draw, rounded corners=3pt, align=center, font=\footnotesize, minimum height=14mm, text width=2.35cm, inner sep=3pt},
+  done/.style={box, very thick, draw=green!50!black, fill=green!6},
+  part/.style={box, very thick, draw=orange!80!black, fill=orange!8},
+  ext/.style={box, draw=black!60},
+  arr/.style={-{Stealth[length=2mm]}, thick, black!65},
+  lbl/.style={font=\scriptsize, text=black!70}
+]
+\node[ext]  (max)  {\textbf{3ds Max scene}\\Corona, naming standard, Datasmith};
+\node[part, right=of max] (plg) {\textbf{Editor plugin}\\UE 5.8 + Python: collision, navmesh, lights by room};
+\node[done, right=of plg] (vr)  {\textbf{VR application}\\Blueprint, OpenXR: doors, menu, light, guide};
+\node[done, right=of vr]  (hmd) {\textbf{PICO 4 Ultra}\\PICO Connect, SteamVR};
+\node[part, below=14mm of plg, xshift=14mm, text width=4.6cm] (gw) {\textbf{AI Gateway (FastAPI)}\\Passport, speech, Fact Guard, TTS; offline on the laptop for the show};
+\node[part, left=of gw, text width=2.1cm] (db) {\textbf{PostgreSQL}\\Projects, passport, speech};
+\node[ext, right=of gw, text width=2.1cm] (api) {\textbf{External APIs}\\LLM, TTS};
+\draw[arr] (max) -- (plg);
+\draw[arr] (plg) -- (vr);
+\draw[arr] (vr) -- (hmd);
+\draw[arr] (plg.south) -- node[lbl, left] {passport} (plg.south |- gw.north);
+\draw[arr] (vr.south |- gw.north) -- node[lbl, right] {speech, audio} (vr.south);
+\draw[arr, {Stealth[length=2mm]}-{Stealth[length=2mm]}] (db) -- (gw);
+\draw[arr, {Stealth[length=2mm]}-{Stealth[length=2mm]}] (gw) -- (api);
+\end{tikzpicture}
+\caption[System architecture]{System architecture. Green: working prototype; orange: partly built or new; grey: existing tool or service.}
+\label{fig:arch}
+\end{figure}
+
+Table~\ref{tab:layers} lists the layers, and Table~\ref{tab:components} the components implemented in the VR prototype under their actual names in the Unreal project.
+
+\begin{table}[H]
+\centering
+\begin{tightblock}
+\begin{tabularx}{\textwidth}{P{2.4cm} P{5.0cm} L}
+\toprule
+\textbf{Layer} & \textbf{Technologies} & \textbf{Responsibility} \\
+\midrule
+Source & 3ds Max 2024, Corona 11, Datasmith Exporter, MaxScript & Scene, naming check, export \\
+Editor plugin & Unreal Engine 5.8.4, Python, Editor Utility menus & Collision, walkable zones, light grouping by room, passport extraction \\
+VR application & UE 5.8.4, OpenXR, Blueprint, UMG, Lumen, Sun \& Sky & Locomotion, doors, menu, light, guide \\
+AI Gateway & Python, FastAPI, PostgreSQL 16, Docker Compose & Passport storage, speech generation, Fact Guard, TTS, audio files \\
+External & LLM API, TTS service & Text and voice \\
+\bottomrule
+\end{tabularx}
+\end{tightblock}
+\caption{System layers}
+\label{tab:layers}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tightblock}
+\footnotesize
+\begin{tabularx}{\textwidth}{P{3.6cm} L}
+\toprule
+\textbf{Component} & \textbf{Role} \\
+\midrule
+\texttt{BP\_JK3D\_XRPawn} & Player: stick walking, 45\textdegree{} snap turn on the right stick, body capsule against walls, floor safety (return to the last valid point), door push-back, menu laser \\
+\texttt{BP\_MovablePart}, \texttt{FindDoor} & Door hinge; the door the hand points at within 150\,cm opens on the trigger, with either hand, from both sides \\
+\texttt{BP\_Menu}, \texttt{WBP\_Menu} & VR menu 1.5\,m in front: sun slider 06--22\,h, temperature slider 2700--6500\,K with $\pm$100\,K buttons, room on/off, all on/off \\
+\texttt{BP\_JK3D\_Scene} & Room and global light events: \texttt{RoomLightOn/Off}, \texttt{AllLightsOn/Off}, \texttt{SetLightTemp} for the current room \\
+\texttt{BP\_JK3D\_LightRoom} & One per room: stores its own temperature and scenario mask, \texttt{ApplyAll} \\
+\texttt{BP\_JK3D\_LightSwitch} & Wall switch cycling scenarios 1, 2, 3, all on, all off (postponed for the show) \\
+\texttt{BP\_JK3D\_Guide} & Robot guide: follows on the left, waits near objects, stays still while the menu is open, waves once, subtitle queue with a 3\,s minimum \\
+\texttt{jk3d\_lighting.py}, \texttt{JK3D\_Collision.py} & Editor scripts: find rooms by \texttt{ROOM\_<ROOM>\_FLOOR}, assign lights to scenarios by name or height, check the collision of all meshes \\
+\bottomrule
+\end{tabularx}
+\end{tightblock}
+\caption{Implemented components of the VR prototype}
+\label{tab:components}
+\end{table}
+
+%----------------------------------------------------------------------------------------
+\section{Technology Selection}
+
+\begin{table}[H]
+\centering
+\begin{tightblock}
+\footnotesize
+\begin{tabularx}{\textwidth}{P{2.1cm} P{2.6cm} P{2.1cm} L}
+\toprule
+\textbf{Decision} & \textbf{Chosen} & \textbf{Alternatives} & \textbf{Reason} \\
+\midrule
+Engine & Unreal Engine 5.8 & Unity, Godot & Datasmith imports 3ds Max/Corona scenes with hierarchy and partial material support; Lumen real-time global illumination; free under USD 1 million revenue \\
+Scene transfer & Datasmith & FBX & Keeps lights, cameras and hierarchy; can be automated from Python \\
+Headset & PICO 4 Ultra via PICO Connect and SteamVR & Meta Quest 3 & Available to the author; PC rendering keeps Lumen quality \\
+VR logic & Blueprint & C++ & Fast iteration, editable through the MCP bridge; C++ only if profiling requires it \\
+Backend & FastAPI & Django, Node.js & Async, automatic OpenAPI documentation, same language as the editor scripts \\
+Database & PostgreSQL & SQLite, MongoDB & Relational passport data with constraints; JSON fields for flexible values \\
+Guide grounding & Approved passport + Fact Guard & Free LLM answers, RAG only & LLMs hallucinate even with retrieval; numbers must be checked after generation \\
+Deployment & Docker Compose on a small VPS; local Docker for the demo & Cloud PaaS & Cheap, reproducible, runs offline on the laptop \\
+\bottomrule
+\end{tabularx}
+\end{tightblock}
+\caption{Technology choices and their justification}
+\label{tab:tech}
+\end{table}
+
+%----------------------------------------------------------------------------------------
+\section{Data Model and Interfaces}
+
+The AI Gateway stores five entities (Table~\ref{tab:entities}) and exposes a versioned REST API (Table~\ref{tab:api}). All requests except the health check require an API key header; keys and provider tokens live only in server environment variables.
+
+\begin{table}[H]
+\centering
+\begin{tightblock}
+\footnotesize
+\begin{tabularx}{\textwidth}{P{2.4cm} P{5.2cm} L}
+\toprule
+\textbf{Entity} & \textbf{Key fields} & \textbf{Rules} \\
+\midrule
+\texttt{project} & id, name, brand, address, floor, languages, approved & id unique; languages ISO 639-1 \\
+\texttt{passport\_field} & project\_id, key, room, value, unit, source, status, required & (project\_id, key) unique; approval blocked while a required field is empty; any change resets approval \\
+\texttt{key\_point} & project\_id, room, language, text, order & written by the designer \\
+\texttt{speech} & project\_id, room, language, text, status, fact\_check & only approved speech is voiced and exported \\
+\texttt{audio} & speech\_id, voice, file path, MIME type & WAV for direct import into Unreal \\
+\bottomrule
+\end{tabularx}
+\end{tightblock}
+\caption{Database entities of the AI Gateway}
+\label{tab:entities}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tightblock}
+\footnotesize
+\begin{tabularx}{\textwidth}{P{4.8cm} L P{3.6cm}}
+\toprule
+\textbf{Endpoint} & \textbf{Purpose} & \textbf{Main errors} \\
+\midrule
+\texttt{POST /v1/projects} & Create a project & 409 exists, 422 invalid \\
+\texttt{PUT /v1/projects/\{id\}/passport} & Upload passport fields from the plugin & 404, 422 \\
+\texttt{PUT /v1/projects/\{id\}/key-points} & Replace the designer's key points & 404, 422 \\
+\texttt{POST /v1/projects/\{id\}/approve} & Approve the passport & 409 required field empty \\
+\texttt{POST /v1/speech} & Speech per room and language with Fact Guard & 409 not approved, 422 unsupported numbers \\
+\texttt{POST /v1/speech/\{id\}/approve} & Approve a speech & 404 \\
+\texttt{POST /v1/tts} & Voice an approved speech & 409 not approved, 502 TTS failure \\
+\texttt{GET /v1/audio/\{id\}} & Download audio & 404 \\
+\texttt{GET /v1/projects/\{id\}/export} & Approved speech and audio for the VR app & 404 \\
+\texttt{GET /health} & Health check including the database & -- \\
+\bottomrule
+\end{tabularx}
+\end{tightblock}
+\caption{AI Gateway API, version 1}
+\label{tab:api}
+\end{table}
+
+\paragraph{Fact Guard rule.} Every number in the generated speech must equal a passport value, or the passport value rounded to the number of decimals used in the speech (2.9\,m is supported by 2.89\,m, 3.0\,m is not). Any other number makes the speech fail and return to the designer. For example, \enquote{the living room is 18.4\,\sqm{}} is accepted, while \enquote{the living room is 25\,\sqm{}, renovation takes 30 days} is rejected. A known limitation is that numbers written as words are not detected, so the LLM prompt requires digits.
+
+%----------------------------------------------------------------------------------------
+\section{Infrastructure and Facilities}
+
+\begin{table}[H]
+\centering
+\begin{tightblock}
+\begin{tabularx}{\textwidth}{P{3.4cm} L P{2.6cm}}
+\toprule
+\textbf{Item} & \textbf{Specification} & \textbf{Status} \\
+\midrule
+Workstation & Author's laptop with an NVIDIA GPU; an audit on 27.10.2026 confirmed it is sufficient & Available \\
+Headset & PICO 4 Ultra, PC link through PICO Connect and SteamVR, OpenXR & Available \\
+Display for the committee & TV or projector over HDMI & To check before the pre-defense \\
+Development bridge & \texttt{unreal-engine-mcp} over the Remote Control API (localhost only) & Working \\
+Backend (demo) & Docker on the laptop, works offline & Implemented, 20 tests \\
+Backend (production) & VPS 2 vCPU / 4 GB, Ubuntu, Docker Compose, Nginx and Let's Encrypt & Planned \\
+Source control & GitHub repository \texttt{kiyalbekkyzy/jk3d-vr} with Git LFS rules for Unreal assets & Created \\
+\bottomrule
+\end{tabularx}
+\end{tightblock}
+\caption{Infrastructure and facilities}
+\label{tab:infra}
+\end{table}
+
+%----------------------------------------------------------------------------------------
+\section{MVP and Prototype Status}
+
+The MVP for the diploma has ten functions. Table~\ref{tab:mvp} shows their state on 24 November 2026.
+
+\begin{table}[H]
+\centering
+\begin{tightblock}
+\footnotesize
+\begin{tabularx}{\textwidth}{P{0.4cm} P{4.2cm} P{3.0cm} L}
+\toprule
+\textbf{\#} & \textbf{Function} & \textbf{Status} & \textbf{Evidence} \\
+\midrule
+1 & Prepare VR: import, collision, navigation, start point & Partly automated & Collision script checked 463 meshes; navigation limited to floor level \\
+2 & Walkable zones, automatic and manual & Working; manual editing in the editor & Door openings walkable after excluding door leaves from navigation \\
+3 & Opening constructor, 5 techniques & Swing doors only & 6 doors, either hand, both sides, push-back \\
+4 & Opening collision check & Not started & -- \\
+5 & Light and time & Working (basic) & Sun slider; per-room temperature remembered; 271 lights in 5 rooms; 3 scenarios by naming \\
+6 & Project passport & Extracted from the scene; stored and approved on the server & Rooms, lights and doors via the editor; areas to confirm \\
+7 & AI guide in Russian and English with voice & Character working; server ready; VR link in progress & Follow, subtitles, wave; 20 backend tests \\
+8 & Finish variants & Pre-defense 2 & -- \\
+9 & Designer screen and TV mirror & Pre-defense 2 & -- \\
+10 & Post-show report & Pre-defense 2 & -- \\
+\bottomrule
+\end{tabularx}
+\end{tightblock}
+\caption{MVP functions and their status}
+\label{tab:mvp}
+\end{table}
+
+Problems solved so far include players getting stuck in door openings (the navigation mesh had holes under closed door leaves), players spawning on the roof (the navigation volume covered the roof), an unreadable VR menu under bright sun (fixed with an exposure-compensated widget material), and room temperature not being saved when the menu was out of view (the widget did not update off-screen).
+
+%----------------------------------------------------------------------------------------
+\section{Budget and Resources}
+
+The prototype needs almost no new spending because the laptop and headset are available (Table~\ref{tab:budget}). Prices are as of November 2026 and rounded.
+
+\begin{table}[H]
+\centering
+\begin{tightblock}
+\begin{tabularx}{\textwidth}{P{4.0cm} P{4.4cm} L}
+\toprule
+\textbf{Item} & \textbf{Cost} & \textbf{Note} \\
+\midrule
+Laptop with NVIDIA GPU & 0 (available) & Confirmed sufficient \\
+PICO 4 Ultra & 0 (available); retail EUR 599 & -- \\
+3ds Max & 0 with the Autodesk education licence & Commercial: about USD 2{,}010 per year \\
+Unreal Engine 5.8 & 0 under USD 1 million revenue & Epic licence \\
+VPS 2 vCPU / 4 GB & about EUR 4--6 per month & Hetzner cost-optimised plan \\
+Domain and TLS & about USD 12 per year; TLS free & Approximate \\
+LLM API for guide scripts & under USD 1 per project & Estimate; to be measured \\
+Text-to-speech & 0 for the prototype & Licence to check before commercial use \\
+Cables, HDMI, accessories & about USD 50 & Approximate \\
+\midrule
+\textbf{Total new spending} & \textbf{about USD 150--200} & To the final defense \\
+\bottomrule
+\end{tabularx}
+\end{tightblock}
+\caption{Budget to the final defense}
+\label{tab:budget}
+\end{table}
+
+\paragraph{Unit economics (hypotheses).} Preparing one presentation costs about 30 minutes of designer time, under USD 1 of API use and a small share of the server. Two revenue models will be tested: a paid VR presentation as an add-on to a design project, and a monthly plugin subscription for studios. Prices are not set yet; they will be asked in 5--10 studio interviews and compared with the current alternatives (panoramas included in the design fee, a Matterport scan at about 5{,}000 KGS, manual tours from USD 10{,}000).
+
+%----------------------------------------------------------------------------------------
+\section{Risks}
+
+\begin{table}[H]
+\centering
+\begin{tightblock}
+\begin{tabularx}{\textwidth}{P{5.0cm} L}
+\toprule
+\textbf{Risk} & \textbf{Mitigation} \\
+\midrule
+Headset link unstable on demo day & Offline build, recorded video as plan B, cables tested in advance \\
+Dynamic light drops FPS below 72 & Lumen Lite, MegaLights, fewer shadowed lights; baked scenarios as fallback \\
+Too many features for the time & Strict MVP; finish variants, designer screen and report moved to pre-defense 2 \\
+LLM states wrong facts & Approved passport, Fact Guard and designer approval \\
+Library furniture is one mesh, fronts cannot open & Openings only for own cabinetry; library items stay static \\
+Authorship of AI-assisted work & Git history, work log, AI-use disclosure, the author explains each mechanism \\
+\bottomrule
+\end{tabularx}
+\end{tightblock}
+\caption{Risks and mitigation}
+\label{tab:risks}
+\end{table}

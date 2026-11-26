@@ -1,0 +1,93 @@
+\chapter{Problems} % Section 1
+\label{Chapter1}
+
+Clients approve interior design projects from images that hide true scale, true light and how the space works in use. The cost of a wrong decision appears later, during renovation.
+
+%----------------------------------------------------------------------------------------
+\section{Problem Statement}
+
+In Kyrgyzstan most interior design studios deliver a project as renders and 360\textdegree{} panoramas made in 3ds Max with Corona Renderer and shared by link. This observation comes from the author's own practice; it will be confirmed by interviews with 5--10 Bishkek studios (Section~\ref{sec:scope}). The format creates four problems:
+
+\begin{enumerate}
+\item \textbf{Distorted scale.} The designer chooses the camera position and focal length. A wide-angle lens and a camera placed in a corner or behind a wall make a room look larger, and narrow passages and conflicts stay out of frame.
+\item \textbf{Idealised light.} Sun and artificial light are set for beauty, not for the real orientation, season and time of day. The client cannot see the room at 19:00 in December, or the difference between 2700\,K and 6500\,K lamps.
+\item \textbf{Untested movement.} Doors and fronts are usually shown open or hidden. Whether a door hits a cabinet, or a drawer hits an oven handle, is found only on site.
+\item \textbf{Weak understanding.} Drawings and separate images do not add up to one space in the client's mind. The designer repeats the same explanations, and the client still signs the project without fully understanding it.
+\end{enumerate}
+
+A related survey in real estate shows the scale of the issue: 33\% of buyers said a property did not match their expectations, with size as the main reason, and 71\% were disappointed at a viewing \citep{movestreets2021}.
+
+%----------------------------------------------------------------------------------------
+\section{Market Research}
+
+\paragraph{Global.} The virtual tour market is forecast to reach USD 7.35 billion by 2031, growing 29.8\% a year; the real estate segment grows 29.2\% a year and Asia-Pacific is the fastest region at 30.5\% \citep{kbv2025}. Hand-built interactive Unreal Engine tours from studios such as ArchiCGI start at about USD 10{,}000 \citep{archicgi}.
+
+\paragraph{Kyrgyzstan.} In the first half of 2026, 837.8 thousand \sqm{} of housing was commissioned (+7.5\%) \citep{econkg2026}, while sales slowed: 2{,}686 apartments were sold in Bishkek in the first quarter of 2026 and the policy rate rose to 12\% \citep{kaktus2026}. More supply and slower sales mean stronger competition for each buyer. Part of the buyers, from Russia and Kazakhstan, buy remotely and need an honest view in advance. Table~\ref{tab:kg-offers} lists what is offered locally.
+
+\begin{table}[H]
+\centering
+\begin{tightblock}
+\begin{tabularx}{\textwidth}{P{3.6cm} P{3.6cm} L}
+\toprule
+\textbf{Offer in Kyrgyzstan} & \textbf{Example} & \textbf{Limitation} \\
+\midrule
+360\textdegree{} panoramas and renders from 3ds Max / Corona & Most design studios (author's observation) & Designer picks the view; no 1:1 scale; no interaction \\
+3D visualisation inside a design project & NeoStyle, USD 10--35 per \sqm{} & Images only \\
+Matterport scanning & Pro3D, about 5{,}000 KGS for up to 100 \sqm{} & Works only for spaces that already exist, not for a project before renovation \\
+\enquote{3D tours and VR} for interiors & Liberty.kg & Format not described publicly \\
+\bottomrule
+\end{tabularx}
+\end{tightblock}
+\caption{Visualisation services for interiors in Kyrgyzstan}
+\label{tab:kg-offers}
+\end{table}
+
+In open sources no interactive VR service with an AI guide for design projects was found in Kyrgyzstan. This is a limitation of desk research and is checked by interviews.
+
+%----------------------------------------------------------------------------------------
+\section{Literature Review}
+
+\paragraph{VR improves non-experts' understanding of a design.} \citet{serpa2020} ran two experiments with architects and real clients, presenting the same project traditionally and in head-mounted VR; clients understood the project more accurately in VR. \citet{alawwad2024} interviewed eight clients and four designers of an interior agency in Medina and found VR useful for presenting interior outputs, more so for commercial than for residential projects. \citet{kurpinar2025} studied immersive VR inside a working architectural office and its effect on presentations to clients.
+
+\paragraph{Adoption barriers remain.} A study of real design reviews found that architects and client representatives still resist VR even though it supports shared understanding \citep{chalmersvr}. Reported barriers include preparation effort, equipment and disruption of the usual workflow. This supports the focus of this work on \emph{preparation time}, not only on visual quality.
+
+\paragraph{Scale perception in VR is good but not perfect.} A review of 33 studies found that egocentric distances in VR were estimated at about 73--74\% of the modelled distance on average \citep{renner2013}. Newer headsets reduce the gap but do not remove it \citep{kelly2022,creemregehr2023}. For this project it means that 1:1 scale and correct eye height are necessary, and that scale perception must be evaluated rather than assumed.
+
+\paragraph{From design models to game engines.} Several papers describe workflows from BIM to VR through game engines: Revit with Twinmotion and Datasmith \citep{wijerathna2024}, heritage BIM to Unity \citep{pybus2019}, and an IFC-based interactive tool with two-way data exchange \citep{nandavar2018}. These workflows are manual or semi-automatic, start from BIM (Revit, IFC) rather than 3ds Max, and do not add opening mechanics, per-room light scenarios or a guide.
+
+\paragraph{AI guides and hallucination.} Large language models can produce fluent but factually wrong text \citep{huang2023}. Retrieval-augmented generation grounds the output in external sources but still fails when retrieval or generation fails \citep{huang2023,alansari2025}. Checking the generated text against a trusted source after generation is one of the main mitigation methods. For a guide that talks to a buyer, an invented area or ceiling height is a real harm, which motivates the \enquote{approved passport and Fact Guard} design described in Chapter~\ref{Chapter3}.
+
+%----------------------------------------------------------------------------------------
+\section{Review of Existing Solutions}
+
+Table~\ref{tab:analogues} compares the main tools and services on the functions this project targets.
+
+\begin{table}[H]
+\centering
+\begin{tightblock}
+\footnotesize
+\begin{tabularx}{\textwidth}{P{2.7cm} P{2.3cm} P{1.6cm} P{1.1cm} P{1.1cm} L}
+\toprule
+\textbf{Solution} & \textbf{Type} & \textbf{Preparation} & \textbf{Doors by hand} & \textbf{Light per room} & \textbf{AI guide; price} \\
+\midrule
+Twinmotion (Epic) & Visualiser + VR & Fast & No & No & No; subscription \\
+Enscape (Chaos) & Revit/SketchUp plugin & Fast, no 3ds Max & No & No & No; USD 575--1{,}139/yr \\
+Chaos Vantage & Real-time V-Ray/Corona viewer & Fast & No & Light editing & No; about USD 995/yr \\
+Lumion & Visualiser & Medium & No & No & No; about USD 19--96/mo \\
+Autodesk Workshop XR & Shared BIM review & Fast & No & No & No; USD 1{,}075/yr \\
+ArchiCGI, Maverickframe & Manual Unreal work & Weeks & On order & On order & No; from USD 10{,}000 \\
+PropVR & Digital twins & Weeks & On order & On order & Sales avatar; on request \\
+Matterport & Scan of existing spaces & Fast & No & No & No; subscription \\
+\midrule
+\textbf{JK3DStudio VR} & \textbf{Unreal plugin for 3ds Max studios} & \textbf{Target $\le$ 30 min} & \textbf{Yes} & \textbf{Yes} & \textbf{Yes, fact-checked, RU/EN; affordable} \\
+\bottomrule
+\end{tabularx}
+\end{tightblock}
+\caption{Existing solutions compared with JK3DStudio VR}
+\label{tab:analogues}
+\end{table}
+
+%----------------------------------------------------------------------------------------
+\section{Research Gap}
+
+Fast tools (Twinmotion, Enscape, Vantage) give real-time VR but no interaction with doors, furniture and room light, and no guide. Interactive tours exist only as manual studio work costing weeks and from USD 10{,}000. None of the reviewed tools starts from a 3ds Max and Corona project, which is the common local workflow. This work addresses that gap: \textbf{interactive, honest VR from a 3ds Max project, prepared in minutes, with a guide that cannot invent facts, for the Kyrgyz market.}

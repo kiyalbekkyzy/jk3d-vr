@@ -1,0 +1,150 @@
+\chapter{Aim and Objectives} % Section 2
+\label{Chapter2}
+
+The aim is to cut the time to turn a 3ds Max interior project into an honest, interactive VR presentation from days to under 30 minutes, with an AI guide that states only approved facts.
+
+%----------------------------------------------------------------------------------------
+\section{Aim}
+
+To design, implement and evaluate JK3DStudio VR: a system that semi-automatically converts a 3ds Max interior design project into an interactive 1:1 VR presentation with physically operable doors, per-room lighting and time of day, and a bilingual (Russian and English) AI guide grounded in a designer-approved project passport.
+
+%----------------------------------------------------------------------------------------
+\section{Objectives}
+
+\begin{enumerate}[label=\textbf{O\arabic*.}]
+\item \textbf{Preparation pipeline.} Build an Unreal Engine 5.8 editor plugin that imports a Datasmith scene and sets collision, walkable zones, movable elements and light groups from a naming standard, with manual correction. Target: a new project ready in $\le$ 30 minutes.
+\item \textbf{Interactive VR application.} Implement 1:1 walking (stick, snap turn, room-scale) with wall and furniture collision, doors opened with either hand from both sides, per-room light on/off and colour temperature 2700--6500\,K, and a sun position slider from 06:00 to 22:00. Target: $\ge$ 72 FPS on PICO 4 Ultra via PICO Connect.
+\item \textbf{Fact-grounded AI guide.} Build an AI Gateway service that turns the designer's key points and the approved passport into guide speech in Russian and English, checks every number against the passport (Fact Guard) and produces voice audio. Target: no unsupported numbers in approved scripts.
+\item \textbf{Evaluation.} Evaluate preparation time, performance, factual accuracy and user perception with designers and clients. Target: tests on at least 2 projects and 5 users.
+\end{enumerate}
+
+%----------------------------------------------------------------------------------------
+\section{Research Questions}
+
+\begin{description}[leftmargin=1.2cm,style=nextline]
+\item[RQ1] Can a naming standard plus geometric rules prepare a 3ds Max interior for interactive VR in $\le$ 30 minutes, with $\ge$ 95\% of movable elements detected when the standard is followed?
+\item[RQ2] Does a fact-checking layer over an LLM remove unsupported numerical claims from the guide's speech compared with generation without checking?
+\item[RQ3] Do clients judge room size, light and door conflicts more accurately in the interactive VR presentation than from renders and 360\textdegree{} panoramas of the same project?
+\end{description}
+
+RQ1 and RQ2 are answered by measurement and automated tests. RQ3 is answered by a user study before the final defense.
+
+%----------------------------------------------------------------------------------------
+\section{Scope and Constraints}
+\label{sec:scope}
+
+\begin{itemize}
+\item \textbf{In scope:} apartments and small spaces modelled in 3ds Max 2024 with Corona 11; PC-tethered VR (PICO 4 Ultra via PICO Connect and SteamVR); Russian and English.
+\item \textbf{Out of scope for the diploma:} Archicad and Revit import, Blender, a standalone headset build, live voice questions, Kyrgyz voice, window view generated from the address.
+\item \textbf{Constraints:} one developer; a consumer laptop with an NVIDIA GPU; the Unreal Engine licence is free under USD 1 million revenue; the demonstration must run offline.
+\end{itemize}
+
+%----------------------------------------------------------------------------------------
+\section{Stakeholders}
+
+\begin{table}[H]
+\centering
+\begin{tightblock}
+\begin{tabularx}{\textwidth}{P{4.2cm} P{3.6cm} L}
+\toprule
+\textbf{Stakeholder} & \textbf{Role} & \textbf{Main need} \\
+\midrule
+Interior designer or small studio & Prepares and runs the presentation & Fast preparation; control over what the guide says \\
+Client and family & Walk through the project & Honest scale and light; easy controls \\
+Developer or real estate agency & Secondary buyer & Remote viewing for buyers from abroad \\
+System administrator (author) & Runs the AI Gateway & Secure keys, logs, backups \\
+External services & LLM and TTS providers & API access within budget \\
+\bottomrule
+\end{tabularx}
+\end{tightblock}
+\caption{Stakeholders and their needs}
+\label{tab:stakeholders}
+\end{table}
+
+%----------------------------------------------------------------------------------------
+\section{Functional Requirements}
+
+Priority: M = must for the MVP, S = should, C = could (after the diploma).
+
+{\begin{tightblock}\footnotesize
+\begin{longtable}{P{1.1cm} P{6.3cm} P{0.9cm} P{4.6cm}}
+\caption{Functional requirements}\label{tab:fr}\\
+\toprule
+\textbf{ID} & \textbf{Requirement} & \textbf{Prio.} & \textbf{Acceptance criterion} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{ID} & \textbf{Requirement} & \textbf{Prio.} & \textbf{Acceptance criterion} \\
+\midrule
+\endhead
+FR-01 & Import a Datasmith scene and set collision on all meshes & M & All meshes have collision; walls block the player \\
+FR-02 & Build walkable zones on floors only; designer can add or remove a zone & M & No zone on roof or furniture; door openings walkable \\
+FR-03 & Detect doors, windows and fronts by the naming standard & M & $\ge$ 95\% found on a scene that follows the standard \\
+FR-04 & Open a door with either controller from both sides; a door pushes the player back & M & Tested on all doors of the pilot apartment \\
+FR-05 & Five opening techniques (swing, slide, fold, lift, drop) with parts and limits & S & Each technique works on one test object \\
+FR-06 & Check openings for collisions and report conflicts & S & Finds 100\% of planted conflicts in a test scene \\
+FR-07 & Group lights by room from \texttt{ROOM\_<room>\_FLOOR} and object names & M & Every light assigned to a room or reported \\
+FR-08 & Per-room light on/off, all on/off, colour temperature 2700--6500\,K remembered per room & M & Value restored after leaving and returning to a room \\
+FR-09 & Sun position by time of day, 06:00--22:00 & M & Shadow direction changes with the slider \\
+FR-10 & Light scenarios per room (main, secondary, decorative) & S & Switch cycles 1, 2, 3, all on, all off \\
+FR-11 & Project passport auto-filled; designer edits and approves; required fields block the show & M & Show cannot start with an empty required field \\
+FR-12 & Generate guide speech in Russian and English from key points and passport & M & Script exists for each room in both languages \\
+FR-13 & Fact Guard: every number in the speech exists in the passport & M & Unsupported numbers are rejected \\
+FR-14 & Text-to-speech audio and subtitles in VR & M & Audio plays with a matching subtitle \\
+FR-15 & Guide character follows the client, stays in view and does not block objects & M & Stays left of the view; still while the menu is open \\
+FR-16 & Designer screen with plan, client position and controls; mirror to TV & S & Designer moves the client to another room \\
+FR-17 & Finish variants A/B switched in VR & S & Floor variant changes in under 1 s \\
+FR-18 & Post-show report (route, time per room, actions) as PDF & C & PDF generated after a session \\
+\bottomrule
+\end{longtable}
+\end{tightblock}}
+
+%----------------------------------------------------------------------------------------
+\section{Non-Functional Requirements}
+
+\begin{table}[H]
+\centering
+\begin{tightblock}
+\begin{tabularx}{\textwidth}{P{1.4cm} P{3.0cm} L}
+\toprule
+\textbf{ID} & \textbf{Quality} & \textbf{Measurable target} \\
+\midrule
+NFR-01 & Performance & $\ge$ 72 FPS in VR, goal 90, measured with \texttt{stat fps} on the pilot apartment \\
+NFR-02 & Preparation time & New project ready for VR in $\le$ 30 minutes \\
+NFR-03 & Responsiveness & Light, temperature or time change visible in $\le$ 1 s \\
+NFR-04 & Accuracy & No unsupported numbers in approved guide scripts \\
+NFR-05 & Availability of demo & Full show runs with no internet connection \\
+NFR-06 & Security & API keys only on the server; HTTPS in production; no keys in the repository \\
+NFR-07 & Privacy & Client name and address stored only with consent; session data deleted on request \\
+NFR-08 & Usability & SUS score $\ge$ 68 from test users \\
+NFR-09 & Comfort & No user stops a 10-minute session because of motion sickness \\
+NFR-10 & Maintainability & Adding a language takes 3 steps (code, translation, voice) and no code change \\
+NFR-11 & Reproducibility & Backend runs with one \texttt{docker compose up} following the README \\
+\bottomrule
+\end{tabularx}
+\end{tightblock}
+\caption{Non-functional requirements}
+\label{tab:nfr}
+\end{table}
+
+%----------------------------------------------------------------------------------------
+\section{Traceability}
+
+\begin{table}[H]
+\centering
+\begin{tightblock}
+\footnotesize
+\begin{tabularx}{\textwidth}{P{0.9cm} P{4.0cm} P{3.4cm} L}
+\toprule
+\textbf{Obj.} & \textbf{Requirements} & \textbf{Component} & \textbf{Test or evidence} \\
+\midrule
+O1 & FR-01--FR-03, FR-05--FR-07, FR-11, NFR-02 & Editor plugin (Python, Editor Utility) & Timed preparation of 2 projects; detection rate \\
+O2 & FR-04, FR-08--FR-10, FR-15--FR-17, NFR-01, NFR-03, NFR-09 & VR application (Blueprint) & FPS log; in-headset checklist; comfort questionnaire \\
+O3 & FR-12--FR-14, NFR-04--NFR-07, NFR-10, NFR-11 & AI Gateway (FastAPI, PostgreSQL) & Automated tests: Fact Guard negative cases, API tests \\
+O4 & NFR-08, RQ1--RQ3 & Whole system & User study, SUS, interviews \\
+\bottomrule
+\end{tabularx}
+\end{tightblock}
+\caption{Traceability from objectives to requirements, components and tests}
+\label{tab:trace}
+\end{table}
